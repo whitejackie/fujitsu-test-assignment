@@ -39,7 +39,7 @@ public class WeatherXmlParser {
         observation.setWmoCode(station.getWmocode());
         observation.setAirTemperature(toDouble(station.getAirtemperature()));
         observation.setWindSpeed(toDouble(station.getWindspeed()));
-        observation.setPhenomenon(station.getPhenomenon());
+        observation.setPhenomenon(emptyToNull(station.getPhenomenon()));
         observation.setObservationTime(observationTime);
         return observation;
     }
@@ -53,5 +53,12 @@ public class WeatherXmlParser {
         } catch (NumberFormatException e) {
             return null;
         }
+    }
+
+    private String emptyToNull(String text) {
+        if (text == null || text.isBlank()) {
+            return null;
+        }
+        return text.trim();
     }
 }
