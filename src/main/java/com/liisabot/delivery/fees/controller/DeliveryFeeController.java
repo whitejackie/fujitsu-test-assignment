@@ -16,7 +16,7 @@ import java.time.Instant;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-
+/** REST endpoint for asking what delivery costs. */
 @RestController 
 @RequestMapping("/api/delivery-fee")
 @Tag (name = "Delivery fee")
@@ -28,6 +28,15 @@ public class DeliveryFeeController {
         this.service = service;
     }
 
+
+    /**
+     * Returns the delivery fee for a city and vehicle type.
+     * 
+     * @param city          Tallinn, Tartu or Pärnu
+     * @param vehicleType   Car, Scooter and Bike
+     * @param datetime      optional moment in ISO format, e.g. 2026-10-19T10:00:00Z
+     * @return the total fee
+     */
     @GetMapping
     @Operation (summary = "Calculate the delivery fee", 
         description = "Uses the latest weather, or the weather and rules valid at 'datetime' if it is given."

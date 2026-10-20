@@ -11,6 +11,7 @@ import com.liisabot.delivery.fees.exception.InvalidInputException;
 import com.liisabot.delivery.fees.exception.ResourceNotFoundException;
 import com.liisabot.delivery.fees.repository.BaseFeeRepository;
 
+/** Create, read, update and delete regional base fees. */
 @Service 
 public class BaseFeeService {
 
@@ -20,10 +21,18 @@ public class BaseFeeService {
         this.repository = repository;
     }
 
+    /**
+     * Returns all base fees.
+     */
     public List<BaseFee> findAll() {
         return repository.findAll();
     }
 
+    /**
+     * Returns one base fee by id.
+     * 
+     * @throws ResourceNotFoundException if there is no base fee with this id
+     */
     public BaseFee findById(Long id) {
         Optional<BaseFee> result = repository.findById(id);
         if (result.isEmpty()) {
@@ -32,12 +41,23 @@ public class BaseFeeService {
         return result.get();
     }
 
+    /**
+     * Saves a new base fee.
+     * 
+     * @throws InvalidInputException if a field is missing or wrong
+     */
     public BaseFee create(BaseFee baseFee) {
         baseFee.setId(null);
         check(baseFee);
         return repository.save(baseFee);
     }
 
+    /**
+     * Replaces an existing base fee.
+     * 
+     * @throws ResourceNotFoundException if there is no base fee with this id
+     * @throws InvalidInputException if a field is missing or wrong
+     */
     public BaseFee update(Long id, BaseFee baseFee) {
         findById(id);
         baseFee.setId(id);
@@ -45,6 +65,13 @@ public class BaseFeeService {
         return repository.save(baseFee);
     }
 
+
+    /**
+     * Deletes a base fee.
+     * 
+     * @param id base fee id to be deleted
+     * @throws ResourceNotFoundException if there is no base fee with this id
+     */
     public void delete(Long id) {
         BaseFee existing = findById(id);
         repository.delete(existing);

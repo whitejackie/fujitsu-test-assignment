@@ -21,6 +21,9 @@ import com.liisabot.delivery.fees.repository.BaseFeeRepository;
 import com.liisabot.delivery.fees.repository.ExtraFeeRuleRepository;
 import com.liisabot.delivery.fees.repository.WeatherObservationRepository;
 
+/**
+ * Calculates the delivery fee: regional base fee plus extra fees for weather conditions
+ */
 @Service 
 public class DeliveryFeeService {
 
@@ -37,6 +40,18 @@ public class DeliveryFeeService {
         this.ruleRepository = ruleRepository;
     }
 
+    /**
+     * Calculates the delivery fee.
+     * 
+     * @param city the delivery city
+     * @param vehicleType the courier's vehicle type
+     * @param at the moment to calculate for, or null for "now"
+     * @return the total fee
+     * 
+     * @throws WeatherDataNotFoundException if there is no weather data for that city and time
+     * @throws ResourceNotFoundException if no base fee exists for that city and vehicle
+     * @throws VehicleForbiddenException if the weather does not allow this vehicle
+     */
     public DeliveryFeeResponse calculate(City city, VehicleType vehicleType, Instant at) {
         Instant moment = Instant.now();
         if (at != null) {
@@ -55,7 +70,9 @@ public class DeliveryFeeService {
         return new DeliveryFeeResponse(city.getDisplayName(), vehicleType.name(), total, weather.getObservationTime());
     }
 
-     /** Finds the newest weather reading of the city at or before the given moment. */
+    /** 
+     * Finds the newest weather reading of the city at or before the given moment.
+     * */
     private WeatherObservation findWeather(City city, Instant moment) {
         Optional<WeatherObservation> result = weatherRepository
                 .findFirstByWmoCodeAndObservationTimeLessThanEqualOrderByObservationTimeDesc(city.getWmoCode(), moment);
@@ -66,7 +83,9 @@ public class DeliveryFeeService {
         return result.get();
     }
 
-    /** Finds the base fee that was valid at the given moment. */
+    /** 
+     * Finds the base fee that was valid at the given moment. 
+     * */
     private BigDecimal findBaseFee(City city, VehicleType vehicle, Instant moment) {
         List<BaseFee> fees = baseFeeRepository.findActiveBaseFees(city, vehicle, moment);
         if (fees.isEmpty()) {

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 
+/** REST endpoints for managing regional base fees. */
 @RestController 
 @RequestMapping("/api/base-fees")
 @Tag(name = "Base fees")
