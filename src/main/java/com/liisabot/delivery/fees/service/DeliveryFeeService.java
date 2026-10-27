@@ -14,6 +14,7 @@ import com.liisabot.delivery.fees.domain.RuleCategory;
 import com.liisabot.delivery.fees.domain.VehicleType;
 import com.liisabot.delivery.fees.domain.WeatherObservation;
 import com.liisabot.delivery.fees.dto.DeliveryFeeResponse;
+import com.liisabot.delivery.fees.exception.InvalidInputException;
 import com.liisabot.delivery.fees.exception.ResourceNotFoundException;
 import com.liisabot.delivery.fees.exception.VehicleForbiddenException;
 import com.liisabot.delivery.fees.exception.WeatherDataNotFoundException;
@@ -48,12 +49,19 @@ public class DeliveryFeeService {
      * @param at the moment to calculate for, or null for "now"
      * @return the total fee
      * 
+     * @throws InvalidInputException if city or vehicle is missing
      * @throws WeatherDataNotFoundException if there is no weather data for that city and time
      * @throws ResourceNotFoundException if no base fee exists for that city and vehicle
      * @throws VehicleForbiddenException if the weather does not allow this vehicle
      */
     public DeliveryFeeResponse calculate(City city, VehicleType vehicleType, Instant at) {
         Instant moment = Instant.now();
+        if (city == null) {
+            throw new InvalidInputException("city is required");
+        }
+        if (vehicleType == null) {
+            throw new InvalidInputException("vehicleType is required");
+        }
         if (at != null) {
             moment = at;
         }

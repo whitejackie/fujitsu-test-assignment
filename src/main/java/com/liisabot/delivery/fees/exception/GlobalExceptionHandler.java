@@ -2,7 +2,7 @@ package com.liisabot.delivery.fees.exception;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
@@ -19,12 +19,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(ex.getStatus()).body(body);
     }
 
-    /** A request body failed validation, e.g. a required field is missing. */
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException ex) {
-        String field = ex.getBindingResult().getFieldError().getField();
-        String problem = ex.getBindingResult().getFieldError().getDefaultMessage();
-        ErrorResponse body = new ErrorResponse(400, field + " " + problem);
+    /** A required request parameter is missing, e.g. no city in the URL. */
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<ErrorResponse> handleMissingParameter(MissingServletRequestParameterException ex) {
+        ErrorResponse body = new ErrorResponse(400, ex.getParameterName() + " is required");
         return ResponseEntity.badRequest().body(body);
     }
 
@@ -33,5 +31,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBadFormat(Exception ex) {
         ErrorResponse body = new ErrorResponse(400, "Invalid request parameter or body format");
         return ResponseEntity.badRequest().body(body);
+    }
+
+    /** Anything unexpected. The details are not shown to the client. */
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleUnexpected(Exception ex) {
+        ErrorResponse body = new ErrorResponse(500, "Something went wrong");
+        return ResponseEntity.status(500).body(body);
     }
 }
